@@ -130,3 +130,12 @@ w2v.wv.cosine_similarity('Paris', data['text'])
 # Look at how the ai chose a phrase.
 w2v.wv.cosine_similarity('Paris', data['target'])
 
+# Look at which words the ai is currently using in this example.
+# Lets try the new phrases.
+model.wv.get_vector('Paris')
+
+# Look at the probability that the ai gave to the phrase in question.
+w2v.wv.predict(['Paris', 'Shakuntala'], model.wv.wv.embedding)
+
+# Lets look at how the ai chose a phrase.
+w2v.wv.cosine_similarity('Paris', data['target'])
