@@ -67,4 +67,66 @@ examples = [["Sydney Airport", "I will be in Paris for three days"],
             ["Shakuntala", "What a coincidence, I was just talking to Paris yesterday"]]
 
 # Train the ai.
-model.train(examples
+model.train(examples, total=3)
+
+# Look at the most probable phrases:
+top_10 = pd.DataFrame(data[['phrase', 'probability']].sort_values(ascending=True)[:10])
+top_10.head()
+
+# Look at the cosine similarity between the model and the text.
+w2v.wv.cosine_similarity('Paris', data['text'])
+
+# Look at how the ai chose a phrase with a probability of 0.55
+# The phrase 'Shakuntala' does not match the phrase in the model so it is excluded.
+w2v.wv.cosine_similarity('Paris', data['target'])
+
+# We can see that the ai is now choosing the right phrases, we can also
+# know the phrase the ai chose.
+
+# Lets try an invalid phrase.
+model.train([['Paris'], ['Shakuntala']], total=1)
+
+# Look at the most probable phrases
+top_10 = pd.DataFrame(data[['phrase', 'probability']].sort_values(ascending=True)[:10])
+top_10.head()
+
+# Look at the cosine similarity between the model and text.
+w2v.wv.cosine_similarity('Shakuntala', data['text'])
+
+# Lets look at how the ai chose a phrase.
+# The first phrase matches the first phrase in the model so it is selected.
+w2v.wv.cosine_similarity('Shakuntala', data['target'])
+
+# Lets try more phrases:
+model.train([['Shakuntala', 'What a coincidence, I was just talking to Paris yesterday']], total=1)
+
+# Look at the most probable phrases
+top_10 = pd.DataFrame(data[['phrase', 'probability']].sort_values(ascending=True)[:10])
+top_10.head()
+
+# Look at the cosine similarity between the model and text.
+w2v.wv.cosine_similarity('Shakuntala', data['text'])
+
+# Lets look at which words the ai is currently using in this example.
+model.wv.get_vector('Shakuntala')
+
+# Look at the probability that the ai gave to the phrase in question.
+w2v.wv.predict(['Shakuntala', 'What a coincidence, I was just talking to Paris yesterday'], model.wv.wv.embedding)
+
+# Lets look at how the ai chose a phrase.
+# It will choose the phrase 'Paris' because the score is higher for that phrase.
+w2v.wv.cosine_similarity('Paris', data['target'])
+
+# Lets try another phrase with a similar sound.
+model.train([['Paris'], ['Shakuntala']], total=1)
+
+# Look at the most probable phrases
+top_10 = pd.DataFrame(data[['phrase', 'probability']].sort_values(ascending=True)[:10])
+top_10.head()
+
+# Look at the cosine similarity between the model and text.
+w2v.wv.cosine_similarity('Paris', data['text'])
+
+# Look at how the ai chose a phrase.
+w2v.wv.cosine_similarity('Paris', data['target'])
+
