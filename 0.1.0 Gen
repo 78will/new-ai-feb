@@ -1,0 +1,70 @@
+# Code a 0.1.0 version of an ai
+
+from . import ai, utils
+from nltk.collocations import *
+from gensim.models import Word2Vec
+import pandas as pd
+import os, sys
+import pandas as pd
+
+# Set this if you want to load a new version of gensim after you have
+# already trained your Word2Vec model.
+DATE = "1 Jan 2019"
+# Load your Word2Vec model
+w2v = Word2Vec.load('/Users/paulj/Documents/nltk_data/word2vec/GloVe-64.Dict')
+# Train the ai.
+utils.train_ai(w2v)
+
+
+# Let's look at the list of phrases that the ai thinks make up this text:
+data = pd.read_csv("/Users/paulj/Documents/ai/sentence_data.csv", sep=",")
+data.head()
+
+# Load the vocabulary.
+vector_vocab = w2v.vocab
+# This defines the model. 
+w2v.wv.init_random(10, min_count=1, size=2000)
+# Use the model to get the cosine similarity between a text and every word in the vocabulary.
+# I have changed the ai to have a vocabulary of 5000 words to fit the
+# size of the vocabulary that nltk gives us.
+w2v.wv.cosine_similarity('Sydney Airport', vector_vocab)
+
+# Now let's define an ai that will use the vocab we created above.
+
+# Build the model.
+w2v.wv.build_vocab(vector_vocab)
+# Initialize the model and use it.
+model = ai.AI()
+model.train(vector_vocab)
+
+# Lets train the ai with an example
+model.train(["Sydney Airport", "I will be in Paris for three days"], total=3)
+
+# Now lets get the probabilities for each phrase in the text.
+data['target'] = model.predict(data['text'])
+data.drop('text', axis=1, inplace=True)
+
+# We can look at the most probable phrases in this case:
+top_10 = pd.DataFrame(data[['phrase', 'probability']].sort_values(ascending=True)[:10])
+top_10.head()
+
+# Lets look at the cosine similarity between the model and text again.
+w2v.wv.cosine_similarity('Sydney Airport', data['text'])
+
+# Now lets look at how a phrase with a probability of 0.3 was chosen.
+w2v.wv.cosine_similarity('Sydney Airport', data['target'])
+
+# Lets look at which words the ai is currently using in this example:
+model.wv.get_vector('Sydney Airport')
+
+# We can train the ai with a list of phrases instead of text
+# Lets define a list of 2 phrases:
+phrases = ['Paris', 'Shakuntala']
+
+# We can also train with multiple sentences:
+# Lets use 2 examples:
+examples = [["Sydney Airport", "I will be in Paris for three days"],
+            ["Shakuntala", "What a coincidence, I was just talking to Paris yesterday"]]
+
+# Train the ai.
+model.train(examples
